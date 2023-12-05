@@ -1,0 +1,86 @@
+name: Manual Terraform Deploy on Azure
+
+on:
+  workflow_dispatch:
+
+permissions:
+      id-token: write
+      contents: read
+
+#These environment variables are used by the terraform azure provider to setup OIDD authenticate. 
+env:
+  ARM_CLIENT_ID: "${{ secrets.AZURE_CLIENT_ID }}"
+  ARM_SUBSCRIPTION_ID: "${{ secrets.AZURE_SUBSCRIPTION_ID }}"
+  ARM_TENANT_ID: "${{ secrets.AZURE_TENANT_ID }}"
+
+jobs:
+
+  # Insert new job to scan code here*
+  #
+  # TODO
+  #
+
+  terraform:
+    name: 'Terraform Apply'
+    runs-on: ubuntu-latest
+    env:
+      #this is needed since we are running terraform with read-only permissions
+      ARM_SKIP_PROVIDER_REGISTRATION: true
+  
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_wrapper: false
+    
+    - name: Terraform Init
+      run: terraform init
+      working-directory: ./terraform/
+    
+    - name: Terraform Validate
+      run: terraform validate
+      working-directory: ./terraform/
+
+    - name: Terraform Apply
+      id: apply
+      run: |
+        terraform apply -auto-approve
+      working-directory: ./terraform/
+
+  deploy-function:
+    name: "Deploy Azure Function"
+    runs-on: ubuntu-latest
+    needs: terraform
+    env:
+      #this is needed since we are running terraform with read-only permissions
+      ARM_SKIP_PROVIDER_REGISTRATION: true
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+
+    - name: Terraform Init Azure
+      run: terraform init -reconfigure
+      working-directory: ./terraform/
+
+    - name: Terraform Deploy Function
+      run: terraform apply -target=local_file.app_deployment_script -auto-approve
+      working-directory: ./terraform/
+
+    # login to Azure to deploy function app
+    - name: Az CLI login
+      uses: azure/login@v1
+      with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+
+    - name: Terraform Run Deploy Function Script
+      run: sh deploy_function_app.sh
+      working-directory: ./terraform/
