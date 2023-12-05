@@ -11,6 +11,7 @@ terraform {
     storage_account_name = "tfstoragetumworkshop"
     container_name       = "tum-workshop-session2"
     key                  = "repo-s2-temp.tfstate"
+    use_oidc             = true
   }
 
 }
