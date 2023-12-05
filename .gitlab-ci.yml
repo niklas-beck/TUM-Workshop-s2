@@ -1,0 +1,31 @@
+image:
+    name: registry.gitlab.com/group_security4cloud/tumworkshopniklas/build-image:latest
+    entrypoint:
+    - '/usr/bin/env'
+    - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+
+
+stages:
+- deploy
+- destroy
+
+
+Deploy:
+  stage: deploy
+  script:
+    - terraform -chdir=terraform init
+    - terraform -chdir=terraform validate
+    - terraform -chdir=terraform apply --var basename="$BASE_NAME" --var resource_group_name="$BASE_NAME" --var location="West Europe" -auto-approve
+    - az login --service-principal -u $ARM_CLIENT_ID -p $ARM_CLIENT_SECRET --tenant $ARM_TENANT_ID
+    - cd terraform && sh deploy_app.sh
+  when: manual
+
+
+Destroy:
+  stage: destroy
+  dependencies:
+    - Deploy
+  script:
+    - terraform -chdir=terraform init
+    - terraform -chdir=terraform destroy --var basename="$BASE_NAME" --var resource_group_name="$BASE_NAME" --var location="West Europe" -auto-approve
+  when: manual
