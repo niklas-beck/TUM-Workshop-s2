@@ -113,7 +113,7 @@ resource "azurerm_storage_blob" "publicblob" {
   for_each = fileset(path.module, "file_uploads/public/*")
  
   name                   = trimprefix(each.key, "file_uploads/public/")
-  storage_account_name   = data.azurerm_resource_group.rg.name
+  storage_account_name   = azurerm_storage_account.storage_account.name
   storage_container_name = azurerm_storage_container.containerpub.name
   type                   = "Block"
   source                 = each.key
@@ -123,7 +123,7 @@ resource "azurerm_storage_blob" "criticalblob" {
   for_each = fileset(path.module, "file_uploads/critical/*")
  
   name                   = trimprefix(each.key, "file_uploads/critical/")
-  storage_account_name   = data.azurerm_resource_group.rg.name
+  storage_account_name   = azurerm_storage_account.storage_account.name
   storage_container_name = azurerm_storage_container.containercrt.name
   type                   = "Block"
   source                 = each.key
