@@ -1,4 +1,4 @@
-name: Manual Terraform Deploy on Azure
+name: Deploy all resources to Azure
 
 on:
   workflow_dispatch:

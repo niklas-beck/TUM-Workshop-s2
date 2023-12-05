@@ -1,4 +1,4 @@
-name: Destroy all resources
+name: Remove all resources from Azure
 
 on:
   workflow_dispatch:
