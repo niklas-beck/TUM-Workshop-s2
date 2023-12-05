@@ -37,31 +37,11 @@ namespace TUMWorkshop
 
         private static readonly Lazy<IAzure> _legacyAzure = new Lazy<IAzure>(() =>
         {
-            // If we find tenant and subscription in environment variables, configure accordingly
-            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(@"AZURE_TENANT_ID"))
-                && !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(@"AZURE_SUBSCRIPTION_ID")))
-            {
-                var tokenCred = _msiCredential.Value;
-                var armToken = tokenCred.GetToken(new TokenRequestContext(scopes: new[] { "https://management.azure.com/.default" }, parentRequestId: null), default).Token;
-                var armCreds = new Microsoft.Rest.TokenCredentials(armToken);
-
-                var graphToken = tokenCred.GetToken(new TokenRequestContext(scopes: new[] { "https://graph.windows.net/.default" }, parentRequestId: null), default).Token;
-                var graphCreds = new Microsoft.Rest.TokenCredentials(graphToken);
-
-                var credentials = new AzureCredentials(armCreds, graphCreds, Environment.GetEnvironmentVariable(@"AZURE_TENANT_ID"), AzureEnvironment.AzureGlobalCloud);
-
-                return Microsoft.Azure.Management.Fluent.Azure
-                    .Authenticate(credentials)
-                    .WithSubscription(Environment.GetEnvironmentVariable(@"AZURE_SUBSCRIPTION_ID"));
-            }
-            else
-            {
-                var credentials = SdkContext.AzureCredentialsFactory
-                    .FromSystemAssignedManagedServiceIdentity(MSIResourceType.AppService, AzureEnvironment.AzureGlobalCloud);
-                return Microsoft.Azure.Management.Fluent.Azure
-                    .Authenticate(credentials)
-                    .WithDefaultSubscription();
-            }
+            var credentials = SdkContext.AzureCredentialsFactory
+                .FromSystemAssignedManagedServiceIdentity(MSIResourceType.AppService, AzureEnvironment.AzureGlobalCloud);
+            return Microsoft.Azure.Management.Fluent.Azure
+                .Authenticate(credentials)
+                .WithDefaultSubscription();
         });
 
         [FunctionName(nameof(GetBlob))]
@@ -77,7 +57,8 @@ namespace TUMWorkshop
             {
                 return new BadRequestObjectResult($@"Request must contain query parameter 'blobUri' designating the name of the file to download");
             }
-            string fileEndpoint = "https://STORAGEACCOUNTNAME.blob.core.windows.net/public/" + blobUriString + ".jpg";
+            // Environment.GetEnvironmentVariable(@"STORAGE_ACCOUNT_NAME")
+            string fileEndpoint = "https://s2tumworkshop0.blob.core.windows.net/public/" + blobUriString + ".jpg";
 
             BlockBlobClient containerClient = new BlockBlobClient(new Uri(fileEndpoint), new DefaultAzureCredential());
 
