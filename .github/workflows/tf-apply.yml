@@ -22,6 +22,8 @@ jobs:
   scan:
     name: Vulnerability Scan
     runs-on: ubuntu-20.04
+    permissions:
+      security-events: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -43,6 +45,8 @@ jobs:
   terraform:
     name: 'Terraform Apply'
     runs-on: ubuntu-latest
+    # uncomment the next line when you add a new job to scan code
+    # needs: scan
     env:
       #this is needed since we are running terraform with read-only permissions
       ARM_SKIP_PROVIDER_REGISTRATION: true
