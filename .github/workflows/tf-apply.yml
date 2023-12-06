@@ -15,37 +15,9 @@ env:
 
 jobs:
 
-  # Insert new job to scan code here*
-  #
-  # TODO
-  #
-  scan:
-    name: Vulnerability Scan
-    runs-on: ubuntu-20.04
-    permissions:
-      security-events: write
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Run Trivy vulnerability scanner in repo mode
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'fs'
-          ignore-unfixed: true
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-
-      - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v2
-        with:
-          sarif_file: 'trivy-results.sarif'
-
   terraform:
     name: 'Terraform Apply'
     runs-on: ubuntu-latest
-    # uncomment the next line when you add a new job to scan code
-    needs: scan
     env:
       #this is needed since we are running terraform with read-only permissions
       ARM_SKIP_PROVIDER_REGISTRATION: true
