@@ -115,8 +115,8 @@ https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/
 ```cs
 resource "azurerm_role_assignment" "functionToStorage" {
   scope                = azurerm_storage_container.containerpub.resource_manager_id
-  role_definition_name = "Storage Blob Data Reader"
-  principal_id         = azurerm_function_app.fxn.identity[0].principal_id
+  role_definition_name = "Storage Blob Data Owner"
+  principal_id         = azurerm_linux_function_app.fxn.identity[0].principal_id
 }
 ```
 </details>
