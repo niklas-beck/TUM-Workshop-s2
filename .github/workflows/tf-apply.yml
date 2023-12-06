@@ -46,7 +46,7 @@ jobs:
     name: 'Terraform Apply'
     runs-on: ubuntu-latest
     # uncomment the next line when you add a new job to scan code
-    # needs: scan
+    needs: scan
     env:
       #this is needed since we are running terraform with read-only permissions
       ARM_SKIP_PROVIDER_REGISTRATION: true
