@@ -100,6 +100,14 @@ How can we reduce the reach of the function and what it can access?
       
 
 Can we change the scope to be on a smaller more granular level?
+
+<details>
+    <summary><strong>More hints pleeeaasee</strong></summary>
+
+Have a look at the terraform resource "azurerm_role_assignment" in ```terraform/main.tf```
+What is the scope? Can we reduce it?
+Have a look at the official documentation from Terraform:
+https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment
   
 <details>
     <summary><strong>Give me the solution!</strong></summary>
@@ -111,6 +119,8 @@ resource "azurerm_role_assignment" "functionToStorage" {
   principal_id         = azurerm_function_app.fxn.identity[0].principal_id
 }
 ```
+</details>
+
 </details>
 
 </details>
