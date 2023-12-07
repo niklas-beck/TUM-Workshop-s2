@@ -156,51 +156,6 @@ resource "azurerm_role_assignment" "functionToStorage" {
 
 </details>
 
-### Defense
-
-<details>
-    <summary><strong>Adding a security scanner</strong></summary>
-
-```yaml
-trivy:
-  stage: scan
-  image: docker:stable
-  services:
-    - name: docker:dind
-      entrypoint: ["env", "-u", "DOCKER_HOST"]
-      command: ["dockerd-entrypoint.sh"]
-  variables:
-    DOCKER_HOST: tcp://docker:2375/
-    DOCKER_DRIVER: overlay2
-    # See https://github.com/docker-library/docker/pull/166
-    DOCKER_TLS_CERTDIR: ""
-    IMAGE: trivy-ci-test:$CI_COMMIT_SHA
-  # Pulls latest version from GitHub
-  before_script:
-    - export TRIVY_VERSION=$(wget -qO - "https://api.github.com/repos/aquasecurity/trivy/releases/latest" | grep '"tag_name":' | sed -E 's/.*"v([^"]+)".*/\1/')
-    - echo $TRIVY_VERSION
-    - wget --no-verbose https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz -O - | tar -zxvf -
-  script:
-    # Scan for LOW/MEDIUM
-    - ./trivy config --severity LOW,MEDIUM,HIGH --exit-code 0 -f json -o ${CI_JOB_ID}_trivy_results.json terraform
-    # Scan for HIGH
-    - ./trivy config --severity CRITICAL --exit-code 1 terraform
-  artifacts:
-    reports:
-      sast: ${CI_JOB_ID}_trivy_results.json
-```
-
-Additionally, you would need to add a stage in the pipeline so that trivy is executed BEFORE your code is deployed
-
-```yaml
-stages:
-- scan
-- deploy
-- destroy
-```
-
-</details>
-
 
 ## Summary
 
