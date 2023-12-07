@@ -62,23 +62,39 @@ Now, let's take a look at what can go wrong with our small application and how c
 Take a moment and analyze the source code in `src/Functions.cs`. Notice anything suspicious? Do you recall the list of pictures that were uploaded? Do you think you can find a way to access all of them?
 
 <details>
-    <summary><strong>Another Hint</strong></summary>
+    <summary><strong>Give me a hint.</strong></summary>
 
 Path traversal
 
 <details>
-    <summary><strong>Another Hint</strong></summary>
+    <summary><strong>Another Hint.</strong></summary>
       
-Maybe we can try to trick the code by using a different representation of charachters (encoding)
+Maybe we can try to trick the code by using a different representation of characters (encoding)
+
+<details>
+    <summary><strong>I need yet another one.</strong></summary>
+
+Ensure that you only use characters that pass the regex check in the code.
+What about the "." dot character? Can we also encode it?
+
+<details>
+    <summary><strong>Please help meeeee!</strong></summary>
+
+It seems the application is smart enough to figure out our simple encoding!
+We need more POWER! <sub><sup>(maybe twice as much?)</sup></sub>
   
 <details>
     <summary><strong>Give me the solution!</strong></summary>
 
-It seems the application is smart enough to figure out our simple encoding! But can it withstand a doubly-encoded string? muahaha!!!!
+Can it withstand a doubly-encoded string? muahaha!!!!
 
 ```
 blobUri=%252E%252E%252Fcritical%252Fsecret
 ```
+
+</details>
+
+</details>
 
 </details>
 
@@ -108,7 +124,18 @@ Have a look at the terraform resource "azurerm_role_assignment" in ```terraform/
 What is the scope? Can we reduce it?
 Have a look at the official documentation from Terraform:
 https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment
-  
+
+<details>
+    <summary><strong>I need more help.</strong></summary>
+
+Currently we are giving our function full access to our storage account with this line:
+```cs
+scope                = azurerm_storage_account.storage_account.id
+```
+But we only want to give it access to the public container inside our storage account.
+How can we reference the public container? \
+The terraform documentation for Azure storage containers might help. (use .resource_manager_id instead of .id)
+
 <details>
     <summary><strong>Give me the solution!</strong></summary>
 
@@ -119,6 +146,8 @@ resource "azurerm_role_assignment" "functionToStorage" {
   principal_id         = azurerm_linux_function_app.fxn.identity[0].principal_id
 }
 ```
+</details>
+
 </details>
 
 </details>
