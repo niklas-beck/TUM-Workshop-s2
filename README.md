@@ -44,7 +44,7 @@ In the past, when we used Connection Strings, it gave the Function app *total co
 In your favorite browser, type the following URL
 
 ```shell
-https://fxnxxxxxx.azurewebsites.net/api/GetBlob?blobUri=my.file
+https://fxnxxxxxx.azurewebsites.net/api/GetBlob?blobUri=myfile
 ```
 
 Where the URL is your unique function app trigger endpoint, which you can get from the portal here:
